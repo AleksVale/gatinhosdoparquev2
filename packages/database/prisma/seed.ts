@@ -66,7 +66,7 @@ async function main(): Promise<void> {
     }),
   ]);
 
-  console.log(`✅ Created ${3 + adopters.length} users (admin, volunteer, 3 adopters).`);
+  console.log(`✅ Created ${2 + adopters.length} users (admin, volunteer, ${adopters.length} adopters).`);
 
   // ─── Seed Cats ────────────────────────────────────────────────────────────
   const cats = await Promise.all([

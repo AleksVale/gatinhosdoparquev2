@@ -19,6 +19,8 @@ jobs:
   validate:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -117,6 +119,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment: production
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -160,7 +164,11 @@ jobs:
             docker compose up --build -d --remove-orphans
 
             # Run database migrations
-            docker compose exec -T api sh -c "cd /app && npx prisma migrate deploy --schema=packages/database/prisma/schema.prisma" || true
+            if ! docker compose exec -T api sh -c "cd /app && npx prisma migrate deploy --schema=packages/database/prisma/schema.prisma"; then
+              echo "⚠️  Migration failed — rolling back deployment"
+              docker compose down
+              exit 1
+            fi
 
             # Clean up unused images
             docker image prune -f

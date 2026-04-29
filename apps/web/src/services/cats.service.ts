@@ -1,4 +1,4 @@
-import type { CatResponseDto, PaginatedResponseDto, QueryCatsDto } from '@repo/types';
+import type { CatResponseDto, PaginatedResponseDto } from '@repo/types';
 import { api } from './api';
 
 type CatQueryParams = {
