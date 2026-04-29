@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  ADOPTER
+  VOLUNTEER
+}
+
+enum CatStatus {
+  AVAILABLE
+  ADOPTED
+  IN_TREATMENT
+  RESERVED
+}
+
+enum CatGender {
+  MALE
+  FEMALE
+}
+
+enum AdoptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      UserRole @default(ADOPTER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  adoptions Adoption[] @relation("AdopterAdoptions")
+
+  @@map("users")
+}
+
+model Cat {
+  id           String    @id @default(cuid())
+  name         String
+  age          Int
+  breed        String?
+  description  String
+  status       CatStatus @default(AVAILABLE)
+  gender       CatGender
+  imageUrl     String?   @map("image_url")
+  isVaccinated Boolean   @default(false) @map("is_vaccinated")
+  isNeutered   Boolean   @default(false) @map("is_neutered")
+  weight       Float?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  adoptions Adoption[]
+
+  @@map("cats")
+}
+
+model Adoption {
+  id        String         @id @default(cuid())
+  catId     String         @map("cat_id")
+  adopterId String         @map("adopter_id")
+  status    AdoptionStatus @default(PENDING)
+  notes     String?
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  cat     Cat  @relation(fields: [catId], references: [id])
+  adopter User @relation("AdopterAdoptions", fields: [adopterId], references: [id])
+
+  @@map("adoptions")
+}
