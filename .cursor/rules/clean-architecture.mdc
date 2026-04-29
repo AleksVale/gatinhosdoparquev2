@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+# Clean Architecture Standards
+
+- Prefer Clean Architecture boundaries over feature-module folder organization. Do not add new business code under `apps/api/src/modules/<feature>` unless maintaining existing code temporarily.
+- Use layers with one-way dependencies: `domain` has enterprise rules and no framework imports; `application` has use cases and ports; `infrastructure` implements external systems such as Prisma, HTTP, storage, auth providers, and queues; `presentation` handles Nest controllers, DTOs, guards, and React UI.
+- Keep Nest modules as thin composition roots only when Nest requires them for dependency injection. They must not contain business rules or become the primary organizing concept.
+- Business behavior belongs in explicit use cases with descriptive names, such as `CreateAdoptionUseCase`, `ListAvailableCatsUseCase`, or `AuthenticateUserUseCase`.
+- Domain code must not depend on Prisma models, Nest decorators, Axios, React Query, browser APIs, environment variables, or transport DTOs.
+- Define repository, gateway, hasher, token, clock, and storage contracts in `application` when a use case needs external behavior. Put implementations in `infrastructure`.
+- Controllers, pages, hooks, and services must map inputs and outputs; they should delegate decisions to use cases instead of owning business rules.
+- Prefer meaningful names over comments. Use descriptive functions, variables, classes, and types that explain intent without line comments or block comments.
+- Do not add JSDoc. Use TypeScript interfaces, types, and explicit return types for public boundaries.
+- Avoid `any`. Use precise types, discriminated unions, generics, or small interfaces.
+- Follow SOLID principles: single responsibility per class/function, dependencies inverted through ports, and small interfaces tailored to the caller.
+- Keep functions small and cohesive. Extract private functions only when the extracted name clarifies behavior or removes meaningful duplication.
+- Validate request DTOs at the presentation boundary. Keep domain invariants inside domain entities, value objects, or use cases.
+- Throw framework-specific exceptions only in presentation or infrastructure adapters. Domain and application code should use typed results or project errors that adapters translate.
+- Prefer explicit names like `authenticatedUser`, `availableCatFilters`, `adoptionStatusTransition`, and `hashedPassword` over short names like `user`, `data`, `result`, or `item` when context is not obvious.
+- For React, keep API clients in infrastructure-like service files, React Query hooks as presentation adapters, and page components focused on rendering and user interaction.
+- When refactoring existing code, move behavior incrementally toward `domain`, `application`, `infrastructure`, and `presentation` without adding compatibility layers for unshipped branch code.
